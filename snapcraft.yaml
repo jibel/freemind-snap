@@ -1,0 +1,41 @@
+name: freemind
+version: 1
+version-script: ls freemind-*.zip|sed 's/.*-\([^-]\+\).zip/\1/'|tr -s '_' '-'
+summary: A premier mind-mapping software written in Java
+description: |
+  A mind mapper, and at the same time an easy-to-operate hierarchical editor
+  with strong emphasis on folding. These two are not really two different
+  things, just two different descriptions of a single application. Often used
+  for knowledge and content management.
+
+  Homepage: http://freemind.sourceforge.net
+
+confinement: strict
+grade: stable
+icon: data/gui/freemind.png
+
+apps:
+  freemind:
+    command: desktop-launch $SNAP/freemind/freemind.sh
+    plugs: 
+      - cups-control
+      - desktop
+      - desktop-legacy
+      - home
+      - network
+      - x11
+    environment:
+      _JAVA_OPTIONS: -Duser.home=$SNAP_USER_DATA 
+
+parts:
+  freemind:
+    after: [desktop-gtk2]
+    plugin: jdk
+    source: .
+    override-build: |
+      mkdir -p $SNAPCRAFT_PART_INSTALL/freemind $SNAPCRAFT_PART_INSTALL/meta/gui
+      unzip -o freemind*.zip -d $SNAPCRAFT_PART_INSTALL/freemind
+      chmod +x $SNAPCRAFT_PART_INSTALL/freemind/freemind.sh
+      cp ./data/gui/* $SNAPCRAFT_PART_INSTALL/meta/gui/
+    build-packages:
+      - default-jre
