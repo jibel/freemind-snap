@@ -1,4 +1,4 @@
-# squirrelsql-snap
+# Freemind Snap
 
 This is the `snapcraft.yaml` file to build the snap package of Freemind.
 
