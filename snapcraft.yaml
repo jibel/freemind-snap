@@ -1,5 +1,6 @@
+base: core18
 name: freemind
-version: 1
+version: "1"
 version-script: ls freemind-*.zip|sed 's/.*-\([^-]\+\).zip/\1/'|tr -s '_' '-'
 summary: A premier mind-mapping software written in Java
 description: |
@@ -25,12 +26,45 @@ apps:
       - network
       - x11
     environment:
-      _JAVA_OPTIONS: -Duser.home=$SNAP_USER_DATA 
+      _JAVA_OPTIONS: -Duser.home=$SNAP_USER_DATA
+      JAVA_HOME: $SNAP/usr/lib/jvm/default-java
+      PATH: $SNAP/usr/lib/jvm/default-java/bin:$SNAP/usr/lib/jvm/default-java/jre/bin:$PATH
 
 parts:
+  desktop-glib:
+    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
+    source-subdir: glib-only
+    plugin: make
+    build-packages:
+      - libglib2.0-dev
+    stage-packages:
+      - adwaita-icon-theme
+      - dmz-cursor-theme
+      - gnome-themes-standard
+      - libgdk-pixbuf2.0-0
+      - libglib2.0-bin
+      - libxkbcommon0
+      - light-themes
+      - locales-all
+      - shared-mime-info
+      - ttf-ubuntu-font-family
+      - xdg-user-dirs
+
+  jdk:
+    plugin: nil
+    stage-packages:
+        -  default-jre
+    filesets:
+        jdk-bits: [-usr/lib/jvm/default-java/bin,
+                   -usr/lib/jvm/default-java/include,
+                   -usr/lib/jvm/default-java/lib,
+                   -usr/share/doc]
+    stage:
+        - $jdk-bits
+
   freemind:
-    after: [desktop-gtk2]
-    plugin: jdk
+    after: [desktop-glib, jdk]
+    plugin: nil
     source: .
     override-build: |
       mkdir -p $SNAPCRAFT_PART_INSTALL/freemind $SNAPCRAFT_PART_INSTALL/meta/gui
@@ -39,3 +73,4 @@ parts:
       cp ./data/gui/* $SNAPCRAFT_PART_INSTALL/meta/gui/
     build-packages:
       - default-jre
+      - unzip
